@@ -71,7 +71,6 @@ jobs:
     - name: Android Kernel Build
       uses: sen-tenz/android-kernel-actions@neutron
       id: build
-      run: curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
       env:
         NAME: ${{ env.RELEASE_NAME }}
         KERNEL_PATH: ${{ env.RELEASE_NAME }}
