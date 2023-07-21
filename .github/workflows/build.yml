@@ -66,13 +66,12 @@ jobs:
 
     - name: Run Script to Remove Ksu
       if: env.REMOVE_KSU == 'true'
-      run: |
-        python script/remove-ksu.py ${{ env.RELEASE_NAME }}
-        curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+      run: python script/remove-ksu.py ${{ env.RELEASE_NAME }
 
     - name: Android Kernel Build
       uses: sen-tenz/android-kernel-actions@neutron
       id: build
+      run: curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
       env:
         NAME: ${{ env.RELEASE_NAME }}
         KERNEL_PATH: ${{ env.RELEASE_NAME }}
