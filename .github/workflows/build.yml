@@ -69,7 +69,7 @@ jobs:
       run: python script/remove-ksu.py ${{ env.RELEASE_NAME }}
 
     - name: Android Kernel Build
-      uses: sen-tenz/android-kernel-actions@neutron
+      uses: bianca2190/android-kernel-actions-KSU@neutron
       id: build
       env:
         NAME: ${{ env.RELEASE_NAME }}
