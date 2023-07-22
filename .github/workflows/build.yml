@@ -1,4 +1,4 @@
-name: Kernel Builder Workflow
+name: Kernel Builder Workflow (Archlinux)
 
 on:
   workflow_dispatch:
@@ -70,7 +70,7 @@ jobs:
       run: python script/remove-ksu.py ${{ env.RELEASE_NAME }}
 
     - name: Android Kernel Build
-      uses: bianca2190/android-kernel-actions-KSU@neutron
+      uses: bianca2190/android-kernel-actions-KSU@archlinux
       id: build
       env:
         NAME: ${{ env.RELEASE_NAME }}
