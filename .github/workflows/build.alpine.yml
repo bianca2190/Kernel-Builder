@@ -1,0 +1,102 @@
+name: Kernel Builder Workflow (Alpine)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Kernel
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Script and Fetch Config
+      uses: actions/checkout@v3
+      with:
+        path: script
+
+    - name: Setup Configurations
+      run: |
+        echo "RELEASE_NAME=$(cat script/config.env | grep "RELEASE_NAME" | head -n 1 | cut -d "=" -f 2 | tr -d '\r' )" >> $GITHUB_ENV
+        echo "KERNEL_REPO=$(cat script/config.env | grep "KERNEL_REPO" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
+        echo "KERNEL_BRANCH=$(cat script/config.env | grep "KERNEL_BRANCH" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
+        echo "KERNEL_SUBMODULES=$(cat script/config.env | grep "KERNEL_SUBMODULES" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
+        echo "ZIPPER_REPO=$(cat script/config.env | grep "ZIPPER_REPO" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
+        echo "ZIPPER_BRANCH=$(cat script/config.env | grep "ZIPPER_BRANCH" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
+        echo "ARCH=$(cat script/config.env | grep "ARCH" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
+        echo "COMPILER=$(cat script/config.env | grep "COMPILER" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
+        echo "DEFCONFIG=$(cat script/config.env | grep "DEFCONFIG" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
+        echo "IMAGE_FILE_NAME=$(cat script/config.env | grep "IMAGE_FILE_NAME" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
+        echo "NEED_DTBO=$(cat script/config.env | grep "NEED_DTBO" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
+        echo "NEED_DTB=$(cat script/config.env | grep "NEED_DTB" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
+        echo "REMOVE_KSU=$(cat script/config.env | grep "REMOVE_KSU" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
+
+
+    - name: Checkout Kernel Source
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ env.KERNEL_REPO }}
+        ref: ${{ env.KERNEL_BRANCH }}
+        path: ${{ env.RELEASE_NAME }}
+        submodules: ${{ env.KERNEL_SUBMODULES }}
+
+    - name: "Set Last Commit variables"
+      id: vars
+      run: |
+        echo "long_sha=$(git -C ${{ env.RELEASE_NAME }} rev-parse HEAD)" >> $GITHUB_OUTPUT
+        echo "short_sha=$(git -C ${{ env.RELEASE_NAME }} rev-parse HEAD | cut -b 1-8 - )" >> $GITHUB_OUTPUT
+
+    - name: Checkout Zipper
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ env.ZIPPER_REPO }}
+        ref: ${{ env.ZIPPER_BRANCH }}
+        path: zipper
+
+    - name: Pre-build Message to Telegram
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.CHANNEL_ID }}
+        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        disable_web_page_preview: true
+        format:  html
+        message: |
+          ${{ env.RELEASE_NAME }} build started.
+          
+          Building on commit <a href="https://github.com/${{ env.KERNEL_REPO }}/commit/${{ steps.vars.outputs.long_sha }}">${{ steps.vars.outputs.short_sha }}</a>.
+
+          <a href="https://github.com/${{ env.KERNEL_REPO }}/commits">All Commits</a> | <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">Running Action</a>
+
+    - name: Run Script to Remove Ksu
+      if: env.REMOVE_KSU == 'true'
+      run: python script/remove-ksu.py ${{ env.RELEASE_NAME }}
+
+    - name: Android Kernel Build
+      uses: bianca2190/android-kernel-actions-KSU@alpine
+
+      id: build
+      env:
+        NAME: ${{ env.RELEASE_NAME }}
+        KERNEL_PATH: ${{ env.RELEASE_NAME }}
+      with:
+        arch: ${{ env.ARCH }}
+        compiler: ${{ env.COMPILER }}
+        defconfig: ${{ env.DEFCONFIG }}
+        image: ${{ env.IMAGE_FILE_NAME }}
+        dtbo: ${{ env.NEED_DTBO }}
+        dtb: ${{ env.NEED_DTB }}
+
+    - name: Post Build to Telegram
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.CHANNEL_ID }}
+        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        disable_web_page_preview: true
+        message: ${{ env.RELEASE_NAME }} is built!, took ${{ steps.build.outputs.elapsed_time }} seconds.
+        document: ${{ steps.build.outputs.outfile }}
+        
+    - name: "Alert Failed Build"
+      uses: appleboy/telegram-action@master
+      if: ${{ failure() }}
+      with:
+        to: ${{ secrets.CHANNEL_ID }}
+        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        message: Failed building ${{ env.RELEASE_NAME }}, check action for more info.
