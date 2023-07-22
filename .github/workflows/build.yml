@@ -28,7 +28,9 @@ jobs:
         echo "NEED_DTBO=$(cat script/config.env | grep "NEED_DTBO" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
         echo "NEED_DTB=$(cat script/config.env | grep "NEED_DTB" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
         echo "REMOVE_KSU=$(cat script/config.env | grep "REMOVE_KSU" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
-
+        echo "ADD_KSU=$(cat script/config.env | grep "ADD_KSU" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
+        echo "KUSER=$(cat script/config.env | grep "KUSER" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_E
+        echo "KHOST=$(cat script/config.env | grep "KHOST" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_E
 
     - name: Checkout Kernel Source
       uses: actions/checkout@v3
@@ -82,6 +84,9 @@ jobs:
         image: ${{ env.IMAGE_FILE_NAME }}
         dtbo: ${{ env.NEED_DTBO }}
         dtb: ${{ env.NEED_DTB }}
+        addksu: ${{ env.ADD_KSU }}
+        kuser: ${{ env.KUSER }}
+        khost: ${{ env.KHOST }}
 
     - name: Post Build to Telegram
       uses: appleboy/telegram-action@master
