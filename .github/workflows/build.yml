@@ -30,6 +30,7 @@ jobs:
         echo "ADD_KSU=$(cat script/config.env | grep "ADD_KSU" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
         echo "REMOVE_KSU=$(cat script/config.env | grep "REMOVE_KSU" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
 
+
     - name: Checkout Kernel Source
       uses: actions/checkout@v3
       with:
@@ -82,7 +83,7 @@ jobs:
         image: ${{ env.IMAGE_FILE_NAME }}
         dtbo: ${{ env.NEED_DTBO }}
         dtb: ${{ env.NEED_DTB }}
-        kernelsu: ${{ env.ADD_KSU }}
+        addksu: ${{ env.ADD_KSU }}
 
     - name: Post Build to Telegram
       uses: appleboy/telegram-action@master
