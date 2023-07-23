@@ -67,10 +67,6 @@ jobs:
 
           <a href="https://github.com/${{ env.KERNEL_REPO }}/commits">All Commits</a> | <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">Running Action</a>
 
-    - name: Run Script to Remove Ksu
-      if: env.REMOVE_KSU == 'true'
-      run: python script/remove-ksu.py ${{ env.RELEASE_NAME }}
-
     - name: Android Kernel Build
       uses: bianca2190/android-kernel-actions-KSU@archlinux
       id: build
@@ -85,8 +81,10 @@ jobs:
         dtbo: ${{ env.NEED_DTBO }}
         dtb: ${{ env.NEED_DTB }}
         addksu: ${{ env.ADD_KSU }}
+        verksu: ${{ env.VER_KSU }}
         kuser: ${{ env.KUSER }}
         khost: ${{ env.KHOST }}
+        kname: ${{ env.KNAME }}
 
     - name: Post Build to Telegram
       uses: appleboy/telegram-action@master
