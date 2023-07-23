@@ -27,7 +27,6 @@ jobs:
         echo "IMAGE_FILE_NAME=$(cat script/config.env | grep "IMAGE_FILE_NAME" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
         echo "NEED_DTBO=$(cat script/config.env | grep "NEED_DTBO" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
         echo "NEED_DTB=$(cat script/config.env | grep "NEED_DTB" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
-        echo "REMOVE_KSU=$(cat script/config.env | grep "REMOVE_KSU" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
         echo "ADD_KSU=$(cat script/config.env | grep "ADD_KSU" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
         echo "VER_KSU=$(cat script/config.env | grep "VER_KSU" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
         echo "KUSER=$(cat script/config.env | grep "KUSER" | head -n 1 | cut -d "=" -f 2 | tr -d '\r')" >> $GITHUB_ENV
