@@ -88,6 +88,7 @@ jobs:
         kuser: ${{ env.KUSER }}
         khost: ${{ env.KHOST }}
         kname: ${{ env.KNAME }}
+        tag: ${{ env.KERNEL_BRANCH }}
 
     - name: Post Build to Telegram
       uses: appleboy/telegram-action@master
