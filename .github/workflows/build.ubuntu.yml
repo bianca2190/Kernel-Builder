@@ -1,4 +1,4 @@
-name: Kernel Builder Workflow (Archlinux)
+name: Kernel Builder Workflow (Ubuntu)
 
 on:
   workflow_dispatch:
@@ -71,7 +71,7 @@ jobs:
           <a href="https://github.com/${{ env.KERNEL_REPO }}/commits">All Commits</a> | <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">Running Action</a>
 
     - name: Android Kernel Build
-      uses: bianca2190/android-kernel-actions-KSU@archlinux
+      uses: bianca2190/android-kernel-actions-KSU@ubuntu
       id: build
       env:
         NAME: ${{ env.RELEASE_NAME }}
